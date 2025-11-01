@@ -12,4 +12,4 @@ go install github.com/greenthepear/krab@main
 krab -i card_pattern_blue.kra -o ../Krita/card_pattern_blue.png
 ```
 
-You can also omit -o and it will create a file in the same directory with `.kra` changed to `.png`.
+You can also omit `-o` and it will create a file in the same directory with `.kra` changed to `.png`.
