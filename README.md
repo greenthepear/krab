@@ -3,7 +3,7 @@
 # Install
 
 ```bash
-go install module github.com/greenthepear/krab@main
+go install github.com/greenthepear/krab@main
 ```
 
 # Usage
