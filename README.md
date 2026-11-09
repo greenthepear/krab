@@ -17,7 +17,7 @@ krab -h
 krab -o ../Krita/card_pattern_blue.png card_pattern_blue.kra
 ```
 
-You can also omit `-o` and it will create a file in the same directory with `.kra` changed to `.png`.
+You can also omit `-o` and it will create a file in the same directory with `.kra` changed to `.png`:
 
 ```bash
 krab card_pattern_blue.kra
@@ -28,7 +28,10 @@ If you specify a directory it will output the png there
 krab -o Graphics/ card_pattern_blue.kra
 ```
 
-Globs are supported
+Globs/multiple files are supported:
 ```bash
 krab *.kra
+```
+```bash
+krab -o Graphics/ krab *.kra
 ```

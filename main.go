@@ -37,14 +37,37 @@ func getOutputFilepath(inFp, outFp string) string {
 
 func main() {
 	outputFilepathFlag := flag.String("o", "",
-		"Output .png file or directory, omitting will automatically set the output in the same directory with a changed extensionl. Will overwrite")
+		"Output file or directory, omitting will automatically set the output in the same directory with changed extension. Will overwrite")
 
 	continueOnError := flag.Bool("c", false,
-		"Do not halt on error, keep process rest of files")
+		"Continue (don't halt) on error, keep processing rest of the files")
+	flag.Usage = func() {
+		fmt.Fprintf(flag.CommandLine.Output(),
+			"Usage of %s: krab [options] [kra file paths]\nOptions:\n", os.Args[0])
+		flag.PrintDefaults()
+		fmt.Fprintf(flag.CommandLine.Output(), `
+Examples:
+	krab green.kra
+	krab -o Graphics/green.png green.kra
+	krab -o Graphics/ green.kra
+	krab -o Graphics/ green.kra jade.kra mint.kra
+	krab -o Graphics/ *.kra
+`)
+	}
 	flag.Parse()
+	args := flag.Args()
+	if args == nil {
+		log.Fatal("No input file(s) provided")
+	}
 
-	if flag.Args() == nil {
-		log.Fatal("No input files provided")
+	if len(args) == 1 {
+		// In case unexpanded glob gets passed
+		// If you name a file with wildcards that's on you
+		var err error
+		args, err = filepath.Glob(args[0])
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	deal := func(file string, e error) {
@@ -56,7 +79,7 @@ func main() {
 		}
 	}
 
-	for _, arg := range flag.Args() {
+	for _, arg := range args {
 		outpath := getOutputFilepath(arg, *outputFilepathFlag)
 
 		zipReader, err := zip.OpenReader(arg)
