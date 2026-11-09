@@ -35,3 +35,11 @@ krab *.kra
 ```bash
 krab -o Graphics/ krab *.kra
 ```
+
+Standard input (for file paths) and output (for file contents) is supported:
+```bash
+printf '%s\n' *.kra | krab -sif
+```
+```bash
+krab green.kra -so > green.png
+```

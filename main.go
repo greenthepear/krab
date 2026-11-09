@@ -2,6 +2,7 @@ package main
 
 import (
 	"archive/zip"
+	"bufio"
 	"errors"
 	"flag"
 	"fmt"
@@ -41,6 +42,11 @@ func main() {
 
 	continueOnError := flag.Bool("c", false,
 		"Continue (don't halt) on error, keep processing rest of the files")
+	stdout := flag.Bool("so", false,
+		"Print mergedfile.png into standard output")
+	stdinFilename := flag.Bool("sif", false,
+		"Get file paths from standard input")
+
 	flag.Usage = func() {
 		fmt.Fprintf(flag.CommandLine.Output(),
 			"Usage of %s: krab [options] [kra file paths]\nOptions:\n", os.Args[0])
@@ -56,17 +62,32 @@ Examples:
 	}
 	flag.Parse()
 	args := flag.Args()
-	if args == nil {
-		log.Fatal("No input file(s) provided")
+
+	if *stdinFilename {
+		scanner := bufio.NewScanner(os.Stdin)
+		for scanner.Scan() {
+			args = append(args, scanner.Text())
+		}
+		if err := scanner.Err(); err != nil {
+			log.Fatal("reading standard input:", err)
+		}
+	}
+
+	if len(args) == 0 {
+		log.Fatal("no input file(s) provided")
 	}
 
 	if len(args) == 1 {
 		// In case unexpanded glob gets passed
 		// If you name a file with wildcards that's on you
 		var err error
-		args, err = filepath.Glob(args[0])
+		fn := args[0]
+		args, err = filepath.Glob(fn)
 		if err != nil {
 			log.Fatal(err)
+		}
+		if len(args) == 0 {
+			log.Fatal("file does not exist: ", fn)
 		}
 	}
 
@@ -100,12 +121,15 @@ Examples:
 				break
 			}
 			// We got it
-			outputFile, err := os.Create(outpath)
-			if err != nil {
-				deal(arg, err)
-				continue
+			outputFile := os.Stdout
+			if !*stdout {
+				outputFile, err = os.Create(outpath)
+				if err != nil {
+					deal(arg, err)
+					continue
+				}
+				defer outputFile.Close()
 			}
-			defer outputFile.Close()
 			_, err = io.Copy(outputFile, rc)
 			if err != nil {
 				deal(arg, err)
