@@ -45,7 +45,7 @@ func main() {
 	stdout := flag.Bool("so", false,
 		"Print mergedfile.png into standard output")
 	stdinFilename := flag.Bool("sif", false,
-		"Get file paths from standard input")
+		"Get file paths from standard input, needs to be newline seperated")
 
 	flag.Usage = func() {
 		fmt.Fprintf(flag.CommandLine.Output(),
